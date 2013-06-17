@@ -8,7 +8,7 @@ def main():
     args = parser.parse_args()
     
     args.K          =   1
-    args.N          =   5
+    args.N          =   1
     args.n_epoch    =   1000
     args.batch_size =   100
 
@@ -17,9 +17,9 @@ def main():
     args.hidden_add_noise_sigma =   0
     args.input_salt_and_pepper  =   0.4
 
-    args.learning_rate  =   0.5
+    args.learning_rate  =   10
     args.momentum       =   0.
-    args.annealing      =   0.995
+    args.annealing      =   1
 
     args.hidden_size    =   2000
 
@@ -31,8 +31,10 @@ def main():
     #args.act            =   'rectifier'
     args.act            =   'sigmoid'
 
-    args.dataset        = 'MNIST'
+    args.dataset        = 'MNIST_binary'
     args.data_path      =   '.'
+
+    args.test           =   True
 
     model.experiment(args, None)
     
