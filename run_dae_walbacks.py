@@ -1,4 +1,18 @@
+"""
+This script will train a single layer model known as Generalized Denoising Auto-Encoder
+WITH 5 steps of 'walkback' training.
 
+Reference paper: 
+'Generalized Denoising Auto-Encoders as Generative Models'
+Yoshua Bengio, Li Yao, Guillaume Alain, Pascal Vincent
+http://arxiv.org/abs/1305.6663
+
+Note:
+This script will produce a better model than the one in the paper as it has a higher
+log-likelihood score (-153 in the above paper) estimated by the Parzen density
+estimator. Training for more than 100 epochs would produce a estimated log-likelihood
+around 170 or higher, with the Parzen window size 0.2 (default).  
+"""
 import argparse
 import model
 
@@ -8,7 +22,7 @@ def main():
     args = parser.parse_args()
     
     args.K          =   1
-    args.N          =   1
+    args.N          =   5
     args.n_epoch    =   1000
     args.batch_size =   100
 

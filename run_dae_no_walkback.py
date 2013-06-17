@@ -1,16 +1,17 @@
 """
-This script will train a single layer model of Generative Denoising Auto-encoder
-WITHOUT walkback training.
+This script will train a single layer model known as Generalized Denoising Auto-Encoder
+WITHOUT the 'walkback' training.
 
-Reference:
-Generalized Denoising Auto-Encoders as Generative Models
+Reference paper: 
+'Generalized Denoising Auto-Encoders as Generative Models'
+Yoshua Bengio, Li Yao, Guillaume Alain, Pascal Vincent
 http://arxiv.org/abs/1305.6663
 
 Note:
 This script will produce a better model than the one in the paper as it has a higher
-log-likelihood score (see Table 1 in the above paper) estimated by the Parzen density
+log-likelihood score (-152 in the above paper) estimated by the Parzen density
 estimator. Training for more than 200 epochs would produce a estimated log-likelihood
-around -10 or higher.   
+around -10 or higher, with the Parzen window size 0.2 (default).  
 """
 import argparse
 import model
@@ -47,7 +48,7 @@ def main():
     args.dataset        = 'MNIST_binary'
     args.data_path      =   '.'
 
-    args.test           =   True
+    args.test           =   False
     
     model.experiment(args, None)
     
