@@ -12,8 +12,8 @@ def main():
     # Add options here
     args = parser.parse_args()
     
-    args.K          =   2
-    args.N          =   1
+    args.K          =   2 # nubmer of hidden layers
+    args.N          =   4 # number of walkbacks
     args.n_epoch    =   1000
     args.batch_size =   100
 

@@ -90,7 +90,7 @@ def experiment(state, channel):
     
     # Network and training specifications
     K               =   state.K # N hidden layers
-    N               =   state.N # walkback = 2 * N * K
+    N               =   state.N # number of walkbacks 
     layer_sizes     =   [N_input] + [state.hidden_size] * K # layer sizes, from h0 to hK (h0 is the visible layer)
     learning_rate   =   theano.shared(cast32(state.learning_rate))  # learning rate
     annealing       =   cast32(state.annealing) # exponential annealing coefficient
@@ -262,8 +262,8 @@ def experiment(state, channel):
         hiddens.append(T.zeros_like(T.dot(hiddens[-1], w)))
 
     # The layer update scheme
-    print "Building the graph :", 2*N*K,"updates"
-    for i in range(2 * N * K):
+    print "Building the graph :", N,"updates"
+    for i in range(N):
         update_layers(hiddens, p_X_chain)
     
 
@@ -274,7 +274,7 @@ def experiment(state, channel):
     COST        =   [T.mean(T.nnet.binary_crossentropy(rX, X)) for rX in p_X_chain]
     show_COST   =   COST[-1] 
     COST        =   numpy.sum(COST)
-
+    
     params          =   weights_list + bias_list
     
     gradient        =   T.grad(COST, params)
