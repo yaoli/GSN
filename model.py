@@ -496,8 +496,3 @@ def experiment(state, channel):
         import ipdb; ipdb.set_trace()
     
     return channel.COMPLETE
-
-if __name__ == '__main__':
-                
-    
-    experiment(args, None)
