@@ -42,6 +42,15 @@ def load_mnist(path):
     data = cPickle.load(open(os.path.join(path,'mnist.pkl'), 'r'))
     return data
 
+def load_mnist_binary(path):
+    data = cPickle.load(open(os.path.join(path,'mnist.pkl'), 'r'))
+    data = [list(d) for d in data] 
+    data[0][0] = (data[0][0] > 0.5).astype('float32')
+    data[1][0] = (data[1][0] > 0.5).astype('float32')
+    data[2][0] = (data[2][0] > 0.5).astype('float32')
+    data = tuple([tuple(d) for d in data])
+    return data
+    
 def load_tfd(path):
     import scipy.io as io
     data = io.loadmat(os.path.join(path, 'TFD_48x48.mat'))
@@ -72,6 +81,11 @@ def experiment(state, channel):
     if state.dataset == 'MNIST':
         (train_X, train_Y), (valid_X, valid_Y), (test_X, test_Y) = load_mnist(state.data_path)
         train_X = numpy.concatenate((train_X, valid_X))
+        
+    elif state.dataset == 'MNIST_binary':
+        (train_X, train_Y), (valid_X, valid_Y), (test_X, test_Y) = load_mnist_binary(state.data_path)
+        train_X = numpy.concatenate((train_X, valid_X))
+        
     elif state.dataset == 'TFD':
         (train_X, train_Y), (valid_X, valid_Y), (test_X, test_Y) = load_tfd(state.data_path)
     
@@ -322,7 +336,7 @@ def experiment(state, channel):
         hiddens_R.append(T.zeros_like(T.dot(hiddens_R[-1], w)))
 
     # The layer update scheme
-    for i in range(2 * N * K):
+    for i in range(N):
         update_layers(hiddens_R, p_X_chain_R, noisy=False)
 
     f_recon = theano.function(inputs = [X], outputs = p_X_chain_R[-1]) 
@@ -348,10 +362,25 @@ def experiment(state, channel):
     # ONE update
     update_layers(network_state_output, visible_pX_chain, noisy=True)
 
+
+    f_sample_simple = theano.function(inputs = [X], outputs = visible_pX_chain[-1])
+    
+    
     # WHY IS THERE A WARNING????
     # because the first odd layers are not used -> directly computed FROM THE EVEN layers
     f_sample2   =   theano.function(inputs = network_state_input, outputs = network_state_output + visible_pX_chain, on_unused_input='warn')
 
+    def sample_some_numbers_single_layer():
+        x0    =   test_X.get_value()[:1]
+        samples = [x0]
+        x  =   f_noise(x0)
+        for i in range(399):
+            x = f_sample_simple(x)
+            samples.append(x)
+            x = numpy.random.binomial(n=1, p=x, size=x.shape).astype('float32')
+            x = f_noise(x)
+        return numpy.vstack(samples)
+            
     def sampling_wrapper(NSI):
         out             =   f_sample2(*NSI)
         NSO             =   out[:len(network_state_output)]
@@ -387,7 +416,11 @@ def experiment(state, channel):
     
     def plot_samples(epoch_number):
         to_sample = time.time()
-        V, H0 = sample_some_numbers()
+        if K == 1:
+            # one layer model
+            V = sample_some_numbers_single_layer()
+        else:
+            V, H0 = sample_some_numbers()
         img_samples =   PIL.Image.fromarray(tile_raster_images(V, (root_N_input,root_N_input), (20,20)))
         
         fname       =   'samples_epoch_'+str(epoch_number)+'.png'
