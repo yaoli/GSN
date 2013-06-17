@@ -68,8 +68,7 @@ def load_tfd(path):
     return (train_X, labels[unlabeled]), (valid_X, labels[unlabeled][:100]), (test_X, labels[labeled])
 
 def experiment(state, channel):
-
-    if state.test and 'config' in os.listdir('.'):
+    if state.test_model and 'config' in os.listdir('.'):
         print 'Loading local config file'
         config_file =   open('config', 'r')
         config      =   config_file.readlines()
@@ -81,6 +80,9 @@ def experiment(state, channel):
         
         for CV in config_vals:
             print CV
+            if CV.startswith('test'):
+                print 'Do not override testing switch'
+                continue        
             try:
                 exec('state.'+CV) in globals(), locals()
             except:
@@ -95,6 +97,7 @@ def experiment(state, channel):
         f = open('config', 'w')
         f.write(str(state))
         f.close()
+
 
     print state
     # Load the data, train = train+valid, and shuffle train
@@ -142,7 +145,7 @@ def experiment(state, channel):
     weights_list    =   [get_shared_weights(layer_sizes[i], layer_sizes[i+1], numpy.sqrt(6. / (layer_sizes[i] + layer_sizes[i+1] )), 'W') for i in range(K)]
     bias_list       =   [get_shared_bias(layer_sizes[i], 'b') for i in range(K + 1)]
 
-    if state.test:
+    if state.test_model:
         # Load the parameters of the last epoch
         # maybe if the path is given, load these specific attributes 
         param_files     =   filter(lambda x:'params' in x, os.listdir('.'))
@@ -526,7 +529,7 @@ def experiment(state, channel):
     if state.vis_init:
         bias_list[0].set_value(logit(numpy.clip(0.9,0.001,train_X.get_value().mean(axis=0))))
 
-    if state.test:
+    if state.test_model:
         # If testing, do not train and go directly to generating samples, parzen window estimation, and inpainting
         print 'Testing : skip training'
         STOP    =   True
@@ -601,6 +604,19 @@ def experiment(state, channel):
 
     # if test
 
+    # 10k samples
+    print 'Generating 10,000 samples'
+    samples, _  =   sample_some_numbers(N=10000)
+    f_samples   =   'samples.npy'
+    numpy.save(f_samples, samples)
+    print 'saved digits'
+
+
+    # parzen
+    print 'Evaluating parzen window'
+    import likelihood_estimation_parzen
+    likelihood_estimation_parzen.main(0.20,'mnist') 
+
     # Inpainting
     print 'Inpainting'
     test_X  =   test_X.get_value()
@@ -635,19 +651,7 @@ def experiment(state, channel):
             os.system('eog inpainting.png')
  
 
-    test_X = theano.shared(test_X) 
-    # 10k samples
-    print 'Generating 10,000 samples'
-    samples, _  =   sample_some_numbers(N=10000)
-    f_samples   =   'samples.npy'
-    numpy.save(f_samples, samples)
-    print 'saved digits'
 
-
-    # parzen
-    print 'Evaluating parzen window'
-    import likelihood_estimation_parzen
-    likelihood_estimation_parzen.main(0.2,'mnist') 
 
     if __name__ == '__main__':
         import ipdb; ipdb.set_trace()
