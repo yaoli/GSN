@@ -39,6 +39,8 @@ def main():
     args.dataset        = 'MNIST'
     args.data_path      =   '.'
 
+    args.test           =   True
+
     model.experiment(args, None)
     
 if __name__ == '__main__':
