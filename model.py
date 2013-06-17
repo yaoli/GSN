@@ -252,10 +252,9 @@ def experiment(state, channel):
     X_corrupt   = salt_and_pepper(X, state.input_salt_and_pepper)
 
     ''' hidden layer init '''
-    
+
     hiddens     = [X_corrupt]
     p_X_chain   = [] 
-    import ipdb; ipdb.set_trace()
     print "Hidden units initialization"
     for w,b in zip(weights_list, bias_list[1:]):
         # init with zeros
