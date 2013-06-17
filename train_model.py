@@ -255,13 +255,9 @@ def experiment(state, channel):
     
     hiddens     = [X_corrupt]
     p_X_chain   = [] 
-
+    import ipdb; ipdb.set_trace()
     print "Hidden units initialization"
     for w,b in zip(weights_list, bias_list[1:]):
-        # no noise, basic f prop to
-        # init f prop
-        #hiddens.append(hidden_activation(T.dot(hiddens[-1], w) + b))
-
         # init with zeros
         print "Init hidden units at zero before creating the graph"
         hiddens.append(T.zeros_like(T.dot(hiddens[-1], w)))
@@ -507,7 +503,7 @@ if __name__ == '__main__':
     # Add options here
     args = parser.parse_args()
     
-    args.K          =   2
+    args.K          =   1
     args.N          =   1
     args.n_epoch    =   1000
     args.batch_size =   100
