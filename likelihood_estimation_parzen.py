@@ -9,7 +9,7 @@ import time
 
 import theano
 from theano import tensor as T
-from train_model import load_mnist
+from model import load_mnist
 
 def local_contrast_normalization(patches):
     patches = patches.reshape((patches.shape[0], -1))
@@ -73,27 +73,23 @@ def get_ll(x, parzen, batch_size=10):
     return lls
 
 
-def main(sigma, dataset):
+def main(sigma, dataset, sample_path='samples.npy'):
     
     # provide a .npy file where 10k generated samples are saved. 
-    filename = '.'
+    filename = sample_path
     
     print 'loading samples from %s'%filename
   
-    (train_X, train_Y), (valid_X, valid_Y), (test_X, test_Y) = load_mnist(state.data_path)
-    
-    idx = range(train_x.shape[0])
-    numpy.random.shuffle(idx)
-    #samples = train_x[idx[:10000]]
+    (train_X, train_Y), (valid_X, valid_Y), (test_X, test_Y) = load_mnist('.')
     
     samples = numpy.load(filename)
     
     parzen = theano_parzen(samples, sigma)
             
-    test_ll = get_ll(test_x, parzen)
+    test_ll = get_ll(test_X, parzen)
     
     print "Mean Log-Likelihood of test set = %.5f" % numpy.mean(test_ll)
-    print "Std of Mean Log-Likelihood of test set = %.5f" % (numpy.std(test_ll) / 100).
+    print "Std of Mean Log-Likelihood of test set = %.5f" % (numpy.std(test_ll) / 100)
 
 
 if __name__ == "__main__":

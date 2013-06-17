@@ -59,14 +59,35 @@ def load_tfd(path):
     return (train_X, labels[unlabeled]), (valid_X, labels[unlabeled][:100]), (test_X, labels[labeled])
 
 def experiment(state, channel):
+
+    if state.test and 'config' in os.listdir('.'):
+        print 'Loading local config file'
+        config_file =   open('config', 'r')
+        config      =   config_file.readlines()
+        try:
+            config_vals =   config[0].split('(')[1:][0].split(')')[:-1][0].split(', ')
+        except:
+            config_vals =   config[0][3:-1].replace(': ','=').replace("'","").split(', ')
+            config_vals =   filter(lambda x:not 'jobman' in x and not '/' in x and not ':' in x and not 'experiment' in x, config_vals)
+        
+        for CV in config_vals:
+            print CV
+            try:
+                exec('state.'+CV) in globals(), locals()
+            except:
+                exec('state.'+CV.split('=')[0]+"='"+CV.split('=')[1]+"'") in globals(), locals()
+     
+
+
+    else:
+        # Save the current configuration
+        # Useful for logs/experiments
+        print 'Saving config'
+        f = open('config', 'w')
+        f.write(str(state))
+        f.close()
+
     print state
-
-    # Save the current configuration
-    # Useful for logs/experiments
-    f = open('config', 'w')
-    f.write(str(state))
-    f.close()
-
     # Load the data, train = train+valid, and shuffle train
     # Targets are not used (will be misaligned after shuffling train
     if state.dataset == 'MNIST':
@@ -107,13 +128,15 @@ def experiment(state, channel):
     weights_list    =   [get_shared_weights(layer_sizes[i], layer_sizes[i+1], numpy.sqrt(6. / (layer_sizes[i] + layer_sizes[i+1] )), 'W') for i in range(K)]
     bias_list       =   [get_shared_bias(layer_sizes[i], 'b') for i in range(K + 1)]
 
-    # Load parameters from pickle if called with additional path argument
-    # Not very useful for now
-    if __name__ == '__main__':
-        if len(sys.argv) > 1:
-            PARAMS  =   cPickle.load(open(sys.argv[1], 'r'))
-            [p.set_value(lp.get_value(borrow=False)) for lp, p in zip(PARAMS[:weights_list], weights_list)]
-            [p.set_value(lp.get_value(borrow=False)) for lp, p in zip(PARAMS[weights_list:], bias_list)]
+    if state.test:
+        # Load the parameters of the last epoch
+        # maybe if the path is given, load these specific attributes 
+        param_files     =   filter(lambda x:'params' in x, os.listdir('.'))
+        max_epoch_idx   =   numpy.argmax([int(x.split('_')[-1].split('.')[0]) for x in param_files])
+        params_to_load  =   param_files[max_epoch_idx]
+        PARAMS = cPickle.load(open(params_to_load,'r'))
+        [p.set_value(lp.get_value(borrow=False)) for lp, p in zip(PARAMS[:len(weights_list)], weights_list)]
+        [p.set_value(lp.get_value(borrow=False)) for lp, p in zip(PARAMS[len(weights_list):], bias_list)]
 
     # Util functions
     def dropout(IN, p = 0.5):
@@ -322,26 +345,24 @@ def experiment(state, channel):
         hiddens_R.append(T.zeros_like(T.dot(hiddens_R[-1], w)))
 
     # The layer update scheme
-    for i in range(2 * N * K):
+    for i in range(2 * K):
         update_layers(hiddens_R, p_X_chain_R, noisy=False)
 
     f_recon = theano.function(inputs = [X], outputs = p_X_chain_R[-1]) 
 
 
-    ##################################
-    # Sampling,                      #
-    ##################################
+    ############
+    # Sampling #
+    ############
     
     # the input to the sampling function
     network_state_input     =   [X] + [T.fmatrix() for i in range(K)]
-    'first input will be a noisy number and zeros at the hidden layer, is this correc?'
    
     # "Output" state of the network (noisy)
     # initialized with input, then we apply updates
     #network_state_output    =   network_state_input
     
     network_state_output    =   [X] + network_state_input[1:]
-    
 
     visible_pX_chain        =   []
 
@@ -350,6 +371,7 @@ def experiment(state, channel):
 
     # WHY IS THERE A WARNING????
     # because the first odd layers are not used -> directly computed FROM THE EVEN layers
+    # unused input = warn
     f_sample2   =   theano.function(inputs = network_state_input, outputs = network_state_output + visible_pX_chain, on_unused_input='warn')
 
     def sampling_wrapper(NSI):
@@ -358,7 +380,7 @@ def experiment(state, channel):
         vis_pX_chain    =   out[len(network_state_output):]
         return NSO, vis_pX_chain
 
-    def sample_some_numbers():
+    def sample_some_numbers(N=400):
         # The network's initial state
         init_vis    =   test_X.get_value()[:1]
 
@@ -370,7 +392,7 @@ def experiment(state, channel):
 
         noisy_h0_chain  =   [noisy_init_vis]
 
-        for i in range(399):
+        for i in range(N-1):
            
             # feed the last state into the network, compute new state, and obtain visible units expectation chain 
             net_state_out, vis_pX_chain =   sampling_wrapper(network_state[-1])
@@ -393,6 +415,61 @@ def experiment(state, channel):
         fname       =   'samples_epoch_'+str(epoch_number)+'.png'
         img_samples.save(fname) 
         print 'Took ' + str(time.time() - to_sample) + ' to sample 400 numbers'
+   
+    ##############
+    # Inpainting #
+    ##############
+    def inpainting(digit):
+        # The network's initial state
+
+        # NOISE INIT
+        init_vis    =   cast32(numpy.random.uniform(size=digit.shape))
+
+        #noisy_init_vis  =   f_noise(init_vis)
+        #noisy_init_vis  =   cast32(numpy.random.uniform(size=init_vis.shape))
+
+        # INDEXES FOR VISIBLE AND NOISY PART
+        noise_idx = (numpy.arange(N_input) % root_N_input < (root_N_input/2))
+        fixed_idx = (numpy.arange(N_input) % root_N_input > (root_N_input/2))
+        # function to re-init the visible to the same noise
+
+        # FUNCTION TO RESET HALF VISIBLE TO DIGIT
+        def reset_vis(V):
+            V[0][fixed_idx] =   digit[0][fixed_idx]
+            return V
+        
+        # INIT DIGIT : NOISE and RESET HALF TO DIGIT
+        init_vis = reset_vis(init_vis)
+
+        network_state   =   [[init_vis] + [numpy.zeros((1,len(b.get_value())), dtype='float32') for b in bias_list[1:]]]
+
+        visible_chain   =   [init_vis]
+
+        noisy_h0_chain  =   [init_vis]
+
+        for i in range(49):
+           
+            # feed the last state into the network, compute new state, and obtain visible units expectation chain 
+            net_state_out, vis_pX_chain =   sampling_wrapper(network_state[-1])
+
+
+            # reset half the digit
+            net_state_out[0] = reset_vis(net_state_out[0])
+            vis_pX_chain[0]  = reset_vis(vis_pX_chain[0])
+
+            # append to the visible chain
+            visible_chain   +=  vis_pX_chain
+
+            # append state output to the network state chain
+            network_state.append(net_state_out)
+            
+            noisy_h0_chain.append(net_state_out[0])
+
+        return numpy.vstack(visible_chain), numpy.vstack(noisy_h0_chain)
+    
+  
+  
+   
     
     def save_params(n, params):
         print 'saving parameters...'
@@ -415,6 +492,12 @@ def experiment(state, channel):
     
     if state.vis_init:
         bias_list[0].set_value(logit(numpy.clip(0.9,0.001,train_X.get_value().mean(axis=0))))
+
+    if state.test:
+        # If testing, do not train and go directly to generating samples, parzen window estimation, and inpainting
+        print 'Testing : skip training'
+        STOP    =   True
+
 
     while not STOP:
         counter     +=  1
@@ -458,7 +541,6 @@ def experiment(state, channel):
         
         print 'W : ', [trunc(abs(w.get_value(borrow=True)).mean()) for w in weights_list]
 
-
         if (counter % 5) == 0:
             # Checking reconstruction
             reconstructed   =   f_recon(noisy_numbers) 
@@ -469,7 +551,6 @@ def experiment(state, channel):
             #epoch_number    =   reduce(lambda x,y : x + y, ['_'] * (4-len(str(counter)))) + str(counter)
             number_reconstruction.save('number_reconstruction'+str(counter)+'.png')
     
-            
             #sample_numbers(counter, 'seven')
             plot_samples(counter)
     
@@ -481,15 +562,59 @@ def experiment(state, channel):
         learning_rate.set_value(new_lr)
 
     # Save
-   
     state.train_costs = train_costs
     state.valid_costs = valid_costs
     state.test_costs = test_costs
 
-    cPickle.dump(params, open('params.pkl', 'w'))
-    
-    plot_samples(counter)
-    #sample_numbers(counter, [])
+    # if test
+
+    # Inpainting
+    print 'Inpainting'
+    test_X  =   test_X.get_value()
+
+    numpy.random.seed(2)
+    test_idx    =   numpy.arange(len(test_Y))
+
+    for Iter in range(10):
+
+        numpy.random.shuffle(test_idx)
+        test_X = test_X[test_idx]
+        test_Y = test_Y[test_idx]
+
+        digit_idx = [(test_Y==i).argmax() for i in range(10)]
+        inpaint_list = []
+
+        for idx in digit_idx:
+            DIGIT = test_X[idx:idx+1]
+            V_inpaint, H_inpaint = inpainting(DIGIT)
+            inpaint_list.append(V_inpaint)
+
+        INPAINTING  =   numpy.vstack(inpaint_list)
+
+        plot_inpainting =   PIL.Image.fromarray(tile_raster_images(INPAINTING, (root_N_input,root_N_input), (10,50)))
+
+        fname   =   'inpainting_'+str(Iter)+'.png'
+        #fname   =   os.path.join(state.model_path, fname)
+
+        plot_inpainting.save(fname)
+
+        if False and __name__ ==  "__main__":
+            os.system('eog inpainting.png')
+ 
+
+    test_X = theano.shared(test_X) 
+    # 10k samples
+    print 'Generating 10,000 samples'
+    samples, _  =   sample_some_numbers(N=10000)
+    f_samples   =   'samples.npy'
+    numpy.save(f_samples, samples)
+    print 'saved digits'
+
+
+    # parzen
+    print 'Evaluating parzen window'
+    import likelihood_estimation_parzen
+    likelihood_estimation_parzen.main(0.2,'mnist') 
 
     if __name__ == '__main__':
         import ipdb; ipdb.set_trace()
