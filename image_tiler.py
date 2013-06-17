@@ -8,9 +8,13 @@ image from a set of samples or weights.
 """
 
 
-import numpy, os
-#import data_provider
+import numpy, os, cPickle
 from PIL import Image
+
+def load_mnist():
+    path = '.'
+    data = cPickle.load(open(os.path.join(path,'mnist.pkl'), 'r'))
+    return data
 
 def scale_to_unit_interval(ndar, eps=1e-8):
     """ Scales all values in the ndarray ndar to be between 0 and 1 """
@@ -137,8 +141,8 @@ def tile_raster_images(X, img_shape, tile_shape, tile_spacing=(0, 0),
         return out_array
 
 def visualize_mnist():
-    train, _,_,_,_,_ = data_provider.load_mnist()
-    design_matrix = train
+    (train_X, train_Y), (valid_X, valid_Y), (test_X, test_Y) = load_mnist()
+    design_matrix = train_X
     images = design_matrix[0:2500, :]
     channel_length = 28 * 28
     to_visualize = images
@@ -150,195 +154,9 @@ def visualize_mnist():
     im_new = Image.fromarray(numpy.uint8(image_data))
     im_new.save('samples_mnist.png')
     os.system('eog samples_mnist.png')
-
-def visualize_cifar10():
-    import cifar10_wrapper
-    train, test = cifar10_wrapper.get_cifar10_raw()
-    
-
-    images = train.X[0:2500, :]
-    channel_length = 32 * 32
-    to_visualize = (images[:, 0:channel_length],
-                    images[:, channel_length:channel_length * 2],
-                    images[:,channel_length*2:channel_length * 3],
-                    None)
-                    
-    image_data = tile_raster_images(to_visualize,
-                                    img_shape=[32,32],
-                                    tile_shape=[50,50],
-                                    tile_spacing=(2,2))
-    im_new = Image.fromarray(numpy.uint8(image_data))
-    im_new.save('samples_cifar10.png')
-    os.system('eog samples_cifar10.png')
-
-def visualize_weight_matrix_single_channel(img_shape, tile_shape, to_visualize):
-    # the weights learned from the black-white image, e.g., MNIST
-    # W: inputs by hidden
-    # img_shape = [28,28]
-    # tile_shape = [10,10]
-    
-    image_data = tile_raster_images(to_visualize,
-                                    img_shape=img_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=(2,2))
-    
-    im_new = Image.fromarray(numpy.uint8(image_data))
-    im_new.save('l0_weights.png')
-    #im_new.save('ica_weights.png')
-    #os.system('eog ica_weights.png')
-
-def visualize_convNet_weights(params):
-    W = params[-4]
-    a,b,c,d = W.shape
-    to_visualize = W.reshape((a*b, c*d))
-    image_data = tile_raster_images(to_visualize,
-                                    img_shape=[c,d],
-                                    tile_shape=[10,5],
-                                    tile_spacing=(2,2))
-    im_new = Image.fromarray(numpy.uint8(image_data))
-    im_new.save('convNet_weights.png')
-    
-def visualize_first_layer_weights(W, dataset_name=None):
-    imgs = W.T
-    if dataset_name == 'MNIST':
-        img_shape = [28,28]
-        to_visualize = imgs
-    elif dataset_name == 'TFD_unsupervised':
-        img_shape = [48,48]
-        to_visualize = imgs
-
-    elif dataset_name == 'CIFAR10':
-        img_shape = [32,32]
-        channel_length = 32 * 32
-        to_visualize = (imgs[:, 0:channel_length],
-            imgs[:, channel_length:channel_length * 2],
-            imgs[:,channel_length*2:channel_length * 3],
-            None)
-    else:
-        raise NotImplementedError('%s does not support visulization of W'%self.dataset_name)
-
-    t = int(numpy.ceil(numpy.sqrt(W.shape[1])))
-
-    tile_shape = [t,t]
-
-    visualize_weight_matrix_single_channel(img_shape,
-                                                   tile_shape, to_visualize)
-    
-def visualize_reconstruction_quality_ae(x, x_tilde, x_reconstructed, image_shape):    
-    # to visualize the reconstruction quality of MNIST on DAE
-    assert x.shape == x_tilde.shape
-    assert x_tilde.shape == x_reconstructed.shape
-    
-    n_show = 400
-    tile_shape = [20, 20]
-    tile_spacing = (2,2)
-    image_shape = image_shape
-    
-    idx = range(x.shape[0])
-    numpy.random.shuffle(idx)
-    
-    use = idx[:n_show]
-    channel_length = image_shape
-    to_visualize = x[use]
-    image_data = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-
-    to_visualize = x_tilde[use]
-    image_corrupted = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-
-    to_visualize = x_reconstructed[use]
-    image_reconstructed = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-    
-    vertical_bar = numpy.zeros((image_data.shape[0], 5))
-    vertical_bar[:,2] += 255
-
-    image = numpy.concatenate((image_data, vertical_bar, image_corrupted,
-                               vertical_bar, image_reconstructed), axis=1)
-    
-    im_new = Image.fromarray(numpy.uint8(image))
-    #im_new.save('reconstruction_mnist.png')
-    #os.system('eog reconstruction_mnist.png')
-    return im_new
-    
-def visualize_gibbs_chain(data, samples, x_noisy, x_reconstruct, jumps, image_shape):
-    # jumps is a binary matrix
-    # randomly pick to visualize
-    #assert data.shape == samples.shape
-    
-    n_show = 400
-    tile_shape = [20, 20]
-    tile_spacing = (2,2)
-    image_shape = image_shape
-    
-    idx = range(data.shape[0])
-    numpy.random.shuffle(idx)
-    
-    use = idx[:n_show]
-    
-    to_visualize = data[use]
-    image_data = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-    
-    use = range(n_show)
-    
-    to_visualize = samples[use]
-    image_1 = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-    to_visualize = x_noisy[use]
-    image_2 = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-    to_visualize = x_reconstruct[use]
-    image_3 = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-    # now masking those intermediate steps in the chain
-    jumps = jumps.flatten()
-    jumps[0] = 0
-    mask = numpy.zeros((n_show)) != 0
-    for idx, jump in enumerate(jumps):
-        if jumps[idx] ==1 and jumps[idx-1]==0:
-            mask[idx-1] = True
-
-    to_visualize = numpy.zeros(x_reconstruct.shape)
-    for i, m in enumerate(mask):
-        if m:
-           to_visualize[i] = x_reconstruct[i]
-    image_4 = tile_raster_images(to_visualize,
-                                    img_shape=image_shape,
-                                    tile_shape=tile_shape,
-                                    tile_spacing=tile_spacing)
-    
-    vertical_bar = numpy.zeros((image_data.shape[0], 5))
-    vertical_bar[:,2] += 255
-    
-    image = numpy.concatenate((image_data, vertical_bar, image_1,
-                               vertical_bar, image_2, vertical_bar,
-                               image_3, vertical_bar, image_4), axis=1)
-    im_new = Image.fromarray(numpy.uint8(image))
-    #im_new.save('samples_mnist%.png')
-    #os.system('eog samples_mnist.png')
-    return im_new
     
 if __name__ == '__main__':
-    #visualize_mnist()
-    #visualize_cifar10()
-    #W = RAB_tools.load_pkl('convNet_saved_params.pkl')
-    #visualize_convNet_weights(W)
-    visualize_weight_matrix_single_channel(W)
+    visualize_mnist()
+    
 
     
