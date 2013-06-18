@@ -1,7 +1,8 @@
 '''
 This scripts produces the model trained on MNIST discussed in the paper:
 
-Deep Generative Stochastic Networks Trainable by Backprop
+'Deep Generative Stochastic Networks Trainable by Backprop'
+Yoshua Bengio, Eric Thibodeau-Laufer
 http://arxiv.org/abs/1306.1091
 '''
 import argparse

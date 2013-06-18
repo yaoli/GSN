@@ -386,8 +386,8 @@ def experiment(state, channel):
     # ONE update
     update_layers(network_state_output, visible_pX_chain, noisy=True)
 
-
-    f_sample_simple = theano.function(inputs = [X], outputs = visible_pX_chain[-1])
+    if K == 1: 
+        f_sample_simple = theano.function(inputs = [X], outputs = visible_pX_chain[-1])
     
     
     # WHY IS THERE A WARNING????
