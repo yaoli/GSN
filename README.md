@@ -27,17 +27,17 @@ run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dsn.
 
 run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dsn.py
 
-(4) to run a one layer Generalized Denoising Autoencoder with walkback in the paper B 
+(4) to run a one layer Generalized Denoising Autoencoder with a walkback procedure in the paper B 
 
 run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_walkback.py
 
-run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback_.py
+run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback.py
 
-(5) to run a one layer Generalized Denoising Autoencoder without walkback in the paper B 
+(5) to run a one layer Generalized Denoising Autoencoder without a walkback procedure in the paper B 
 
 run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_no_walkback.py
 
-run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_no_walkback_.py 
+run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_no_walkback.py 
 
 (6) Getting the log-likelihood estimation and inpainting as described in the paper A. 
 
@@ -48,12 +48,11 @@ THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dsn.py --test_mo
 ---------------------------
 Important tips for running the codes:
 
-* (4) and (5) will generate both the reconstruction images and samples, and save parameters every 5 epochs.
+* (4) and (5) will generate images for both the denoising and pseudo-Gibbs sampling, and save parameters every 5 epochs.
 
-* The code is written such that it produces better results on the estimated log-likelihood by Parzen density estimator than in our paper B. For example, (4) produces a log-likelihood of around 150 and (5) produces 50. Both number could be higher if the model is trained longer. Trust this number with precaution. As the estimation from the Parzen density estimator is based and tends to prefer rigid samples. We therefore provide some examples of the reconstruction and generated samples under the directory 'images/' for 3 types of models.  
+* The code is written such that it produces better results on the estimated log-likelihood by Parzen density estimator than in our paper B. For example, (4) produces a log-likelihood of around 150 and (5) produces 50. Both number could be higher if the model is trained longer. Trust this number with precaution. As the estimation from the Parzen density estimator is based and tends to prefer rigid samples. You will notice this number is high even when the generated images do not look good. Trust the visulizations more. 
 
-
-* The codes outputs a lot of information on the screen. This is meant to show the progression. You can safely ignore the warning message from Theano. The training starts when the following is printed out:
+* The codes outputs a lot of information on the screen. This is meant to show the progression. Also you can safely ignore the warning message from Theano. The training starts when the following is printed out:
 
 1       Train :  0.607192       Valid :  0.367054       Test  :  0.364999       time :  20.40169 MeanVisB :  -0.22522 W :  ['0.024063', '0.022423']
 
