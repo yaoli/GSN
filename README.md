@@ -1,9 +1,11 @@
 This package contains the accompanied codes for the following two papers:
 
 A. Deep Generative Stochastic Networks Trainable by Backprop
+
 Yoshua Bengio, Éric Thibodeau-Laufer
 
 B. Generalized Denoising Auto-Encoders as Generative Models
+
 Yoshua Bengio, Li Yao, Guillaume Alain, Pascal Vincent
 
 SETUPS:
