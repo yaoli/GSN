@@ -50,7 +50,6 @@ Important tips for running the codes:
 
 * (3), (4) and (5) will generate images for both the denoising and pseudo-Gibbs sampling, and save parameters every 5 epochs. We have provided some examples of the reconstruction and generated samples(consecutive Gibbs samples) under the directory 'images/' for 3 types of models. By just looking at the pictures there, it is clearly true that 2-layer model beats the 1-layer model with walkback training, which then beats the 1-layer model without walkback training.
 
-
 * The code is written such that it produces better results on the estimated log-likelihood by Parzen density estimator than in our paper B. For example, (4) produces a log-likelihood of around 150 and (5) produces 50. Both number could be higher if the model is trained longer. Trust this number with precaution. As the estimation from the Parzen density estimator is biased and tends to prefer rigid samples. You will notice this number is high even when the generated images do not look good. Trust the visulizations more. 
 
 * The codes outputs a lot of information on the screen. This is meant to show the progression. Also you can safely ignore the warning message from Theano. The training starts when the following is printed out:
@@ -66,3 +65,7 @@ Important tips for running the codes:
 5       Train :  0.266533       Valid :  0.264087       Test  :  0.265572       time :  20.26944 MeanVisB :  -0.47086 W :  ['0.023840', '0.022517']
 
 For each training epoch, the first 3 numbers are the training cost, followed by the training time (in seconds), then the mean of the visable bias, and mean of the magnitude of weights. 
+
+
+----------------
+contact us: li.yao@umontreal.ca
