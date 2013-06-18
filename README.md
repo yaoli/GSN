@@ -64,7 +64,7 @@ Important tips for running the codes:
 
 5       Train :  0.266533       Valid :  0.264087       Test  :  0.265572       time :  20.26944 MeanVisB :  -0.47086 W :  ['0.023840', '0.022517']
 
-For each training epoch, the first 3 numbers are the training cost, followed by the training time (in seconds), then the mean of the visable bias, and mean of the magnitude of weights. 
+For each training epoch, the first 3 numbers are the training cost, followed by the training time (in seconds, on GPU Nvidia GeForce GTX580, 300 seconds in Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz), then the mean of the visable bias, and mean of the magnitude of weights. 
 
 
 ----------------
