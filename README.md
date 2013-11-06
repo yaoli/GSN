@@ -23,9 +23,9 @@ to visualize MNIST: 'python image_tiler.py'
 
 (3) to run a two layer Generative Stochastic Network in the paper A
 
-run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dsn.py
+run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_gsn.py
 
-run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dsn.py
+run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py
 
 (4) to run a one layer Generalized Denoising Autoencoder with a walkback procedure in the paper B 
 
@@ -43,7 +43,7 @@ run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_
 
 To test a model, by generating inpainting pictures, and 10000 samples used by the parzen density estimator, run this command in this directory, with the params_epoch_X.pkl and config file that was generated when training the model. If multiple params_epoch_X.pkl files are present, the one with the largest epoch number is used.
 
-THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dsn.py --test_model 1
+THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py --test_model 1
 
 ---------------------------
 Important tips for running the codes:
