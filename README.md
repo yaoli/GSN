@@ -2,7 +2,7 @@ This package contains the accompanied codes for the following two papers:
 
 A. Deep Generative Stochastic Networks Trainable by Backprop
 
-Yoshua Bengio, Éric Thibodeau-Laufer
+Yoshua Bengio, Éric Thibodeau-Laufer, Jason Yosinski
 
 B. Generalized Denoising Auto-Encoders as Generative Models
 
@@ -21,7 +21,7 @@ unzip the file to generate mnist.pkl using 'gunzip mnist.pkl.gz'
 
 to visualize MNIST: 'python image_tiler.py'
 
-(3) to run a two layer Deep Stochastic Network in the paper A
+(3) to run a two layer Generative Stochastic Network in the paper A
 
 run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dsn.py
 
