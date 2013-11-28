@@ -13,15 +13,15 @@ This package contains the accompanying code for the following two papers:
 
 
 Setup
-===============
+---------------------
 
-### Install Theano
+#### Install Theano
 
 Download Theano and make sure it's working properly.  All the
 information you need can be found by following this link:
 http://deeplearning.net/software/theano/
 
-### Prepare the MNIST dataset
+#### Prepare the MNIST dataset
 
 1. Download the MNIST dataset from http://deeplearning.net/data/mnist/mnist.pkl.gz
 
@@ -34,7 +34,7 @@ http://deeplearning.net/software/theano/
 
 
 Reproducing the Results
-===============
+---------------------
 
 The below commands are given in two formats: the first will run on the
 GPU and the second on the CPU. Choose whichever is most appropriate
@@ -70,7 +70,7 @@ is being used on a machine with a compatible GPU (more about
 
 
 
-### Important tips for running the codes
+#### Important tips for running the codes
 
 * (1), (2) and (3) will generate images for both the denoising and
   pseudo-Gibbs sampling, and save parameters every 5 epochs. We have
@@ -107,6 +107,6 @@ is being used on a machine with a compatible GPU (more about
   and mean of the magnitude of weights.
 
 
-### Contact
+#### Contact
 
 Questions? Contact us: li.yao@umontreal.ca
