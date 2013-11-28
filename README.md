@@ -1,13 +1,13 @@
 This package contains the accompanying code for the following two papers:
 
 * Yoshua Bengio, Éric Thibodeau-Laufer, Jason
-  Yosinski. [Deep Generative Stochastic Networks Trainable by Backprop](http://arxiv.org/abs/1306.1091). arXiv
-  preprint arXiv:1306.1091 ([PDF](http://arxiv.org/pdf/1306.1091v3),
+  Yosinski. [Deep Generative Stochastic Networks Trainable by Backprop](http://arxiv.org/abs/1306.1091). _arXiv
+  preprint arXiv:1306.1091._ ([PDF](http://arxiv.org/pdf/1306.1091v3),
   [BibTeX](https://raw.github.com/yosinski/GSN/master/doc/gsn.bib))
 
 * Yoshua Bengio, Li Yao, Guillaume Alain, Pascal
-  Vincent. [Generalized Denoising Auto-Encoders as Generative Models](http://papers.nips.cc/paper/5023-generalized-denoising-auto-encoders-as-generative-models). NIPS,
-  2013. ([PDF](http://media.nips.cc/nipsbooks/nipspapers/paper_files/nips26/491.pdf),
+  Vincent. [Generalized Denoising Auto-Encoders as Generative Models](http://papers.nips.cc/paper/5023-generalized-denoising-auto-encoders-as-generative-models). _NIPS,
+  2013._ ([PDF](http://media.nips.cc/nipsbooks/nipspapers/paper_files/nips26/491.pdf),
   [BibTeX](https://raw.github.com/yosinski/GSN/master/doc/dae.bib))
 
 
