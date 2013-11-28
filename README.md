@@ -72,11 +72,27 @@ is being used on a machine with a compatible GPU (more about
 
 ### Important tips for running the codes
 
-* (1), (2) and (3) will generate images for both the denoising and pseudo-Gibbs sampling, and save parameters every 5 epochs. We have provided some examples of the reconstruction and generated samples (consecutive Gibbs samples) under the directory 'images/' for 3 types of models. By just looking at the pictures there, it is clear that 2-layer model beats the 1-layer model with walkback training, which then beats the 1-layer model without walkback training.
+* (1), (2) and (3) will generate images for both the denoising and
+  pseudo-Gibbs sampling, and save parameters every 5 epochs. We have
+  provided some examples of the reconstruction and generated samples
+  (consecutive Gibbs samples) under the directory 'images/' for 3
+  types of models. By just looking at the pictures there, it is clear
+  that 2-layer model beats the 1-layer model with walkback training,
+  which then beats the 1-layer model without walkback training.
 
-* The code is written such that it produces better results on the estimated log-likelihood by Parzen density estimator than in our paper \[2\]. For example, (2) produces a log-likelihood of around 150 and (3) produces 50. Both number could be higher if the model is trained longer. Trust this number with precaution, as the estimation from the Parzen density estimator is biased and tends to prefer rigid samples. You will notice this number is high even when the generated images do not look good. Trust the visualizations more.
+* The code is written such that it produces better results on the
+  estimated log-likelihood by Parzen density estimator than in our
+  paper \[2\]. For example, (2) produces a log-likelihood of around
+  150 and (3) produces 50. Both number could be higher if the model is
+  trained longer. Trust this number with precaution, as the estimation
+  from the Parzen density estimator is biased and tends to prefer
+  rigid samples. You will notice this number is high even when the
+  generated images do not look good. Trust the visualizations more.
 
-* The codes outputs a lot of information on the screen. This is meant to show the progression. Also you can safely ignore the warning message from Theano. The training starts when the following is printed out:
+* The codes outputs a lot of information on the screen. This is meant
+  to show the progression. Also you can safely ignore the warning
+  message from Theano. The training starts when the following is
+  printed out:
 
         1       Train :  0.607192       Valid :  0.367054       Test  :  0.364999       time :  20.40169 MeanVisB :  -0.22522 W :  ['0.024063', '0.022423']
         2       Train :  0.302400       Valid :  0.277827       Test  :  0.277751       time :  20.33490 MeanVisB :  -0.32510 W :  ['0.023877', '0.022512']
@@ -84,7 +100,11 @@ is being used on a machine with a compatible GPU (more about
         4       Train :  0.268086       Valid :  0.267201       Test  :  0.268247       time :  20.37603 MeanVisB :  -0.43271 W :  ['0.023856', '0.022535']
         5       Train :  0.266533       Valid :  0.264087       Test  :  0.265572       time :  20.26944 MeanVisB :  -0.47086 W :  ['0.023840', '0.022517']
 
-For each training epoch, the first 3 numbers are the cost on the training, validation, and test sets, followed by the training time (in seconds, on GPU Nvidia GeForce GTX580, 300 seconds in Intel(R) Core(TM) i7-2600K CPU @ 3.40GHz), then the mean of the visible bias, and mean of the magnitude of weights. 
+  For each training epoch, the first 3 numbers are the cost on the
+  training, validation, and test sets, followed by the training time
+  (in seconds, on GPU Nvidia GeForce GTX580, 300 seconds in Intel(R)
+  Core(TM) i7-2600K CPU @ 3.40GHz), then the mean of the visible bias,
+  and mean of the magnitude of weights.
 
 
 ### Contact
