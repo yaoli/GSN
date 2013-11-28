@@ -36,10 +36,11 @@ http://deeplearning.net/software/theano/
 Reproducing the Results
 ===============
 
-All below commands are given in two formats: the first will run on the
+The below commands are given in two formats: the first will run on the
 GPU and the second on the CPU. Choose whichever is most appropriate
 for your setup.  Of course, the GPU versions will only work if Theano
-is being used on a machine with a compatible GPU.
+is being used on a machine with a compatible GPU (more about
+[using the GPU in Theano](http://deeplearning.net/software/theano/tutorial/using_gpu.html)).
 
 1. To run a two layer Generative Stochastic Network from paper \[1\]
 
@@ -51,25 +52,21 @@ is being used on a machine with a compatible GPU.
         THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_walkback.py
         THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback.py
 
-### To run a one layer Generalized Denoising Autoencoder without a walkback procedure from the paper \[2\]
+3. To run a one layer Generalized Denoising Autoencoder without a walkback procedure from the paper \[2\]
 
-On GPU
+        THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_no_walkback.py
+        THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_no_walkback.py
 
-    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_no_walkback.py
+4. Getting the log-likelihood estimation and inpainting as described in paper \[1\]
 
-On CPU
+    To test a model, by generating inpainting pictures, and 10000
+    samples used by the parzen density estimator, run this command in
+    this directory, with the `params_epoch_X.pkl` and `config` file
+    that was generated when training the model. If multiple
+    `params_epoch_X.pkl` files are present, the one with the largest
+    epoch number is used.
 
-    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_no_walkback.py
-
-### Getting the log-likelihood estimation and inpainting as described in paper \[1\]
-
-To test a model, by generating inpainting pictures, and 10000 samples
-used by the parzen density estimator, run this command in this
-directory, with the `params_epoch_X.pkl` and `config` file that was
-generated when training the model. If multiple `params_epoch_X.pkl`
-files are present, the one with the largest epoch number is used.
-
-    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py --test_model 1
+        THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py --test_model 1
 
 
 
