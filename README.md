@@ -1,56 +1,85 @@
 This package contains the accompanying code for the following two papers:
 
-* Yoshua Bengio, Éric Thibodeau-Laufer, Jason
+* \[1\] Yoshua Bengio, Éric Thibodeau-Laufer, Jason
   Yosinski. [Deep Generative Stochastic Networks Trainable by Backprop](http://arxiv.org/abs/1306.1091). _arXiv
   preprint arXiv:1306.1091._ ([PDF](http://arxiv.org/pdf/1306.1091v3),
   [BibTeX](https://raw.github.com/yosinski/GSN/master/doc/gsn.bib))
 
-* Yoshua Bengio, Li Yao, Guillaume Alain, Pascal
+* \[2\] Yoshua Bengio, Li Yao, Guillaume Alain, Pascal
   Vincent. [Generalized Denoising Auto-Encoders as Generative Models](http://papers.nips.cc/paper/5023-generalized-denoising-auto-encoders-as-generative-models). _NIPS,
   2013._ ([PDF](http://media.nips.cc/nipsbooks/nipspapers/paper_files/nips26/491.pdf),
   [BibTeX](https://raw.github.com/yosinski/GSN/master/doc/dae.bib))
 
 
 
-SETUPS:
+Setup
+===============
 
-(1) Download Theano and make sure it's working properly. 
-All the information you need can be found by following this link.
+### Install Theano
+
+Download Theano and make sure it's working properly.  All the
+information you need can be found by following this link:
 http://deeplearning.net/software/theano/
 
-(2) Prepare MNIST dataset
-download MNIST datasets from http://deeplearning.net/data/mnist/mnist.pkl.gz
+### Prepare the MNIST dataset
 
-unzip the file to generate mnist.pkl using 'gunzip mnist.pkl.gz'
+1. Download the MNIST dataset from http://deeplearning.net/data/mnist/mnist.pkl.gz
 
-to visualize MNIST: 'python image_tiler.py'
+2. Unzip the file to generate mnist.pkl using 'gunzip mnist.pkl.gz'
 
-(3) to run a two layer Generative Stochastic Network in the paper A
+3. (Optional) To visualize MNIST, run
 
-run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_gsn.py
+        python image_tiler.py
 
-run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py
 
-(4) to run a one layer Generalized Denoising Autoencoder with a walkback procedure in the paper B 
 
-run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_walkback.py
+Reproducing the Results
+===============
 
-run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback.py
+### To run a two layer Generative Stochastic Network from paper \[1\]
 
-(5) to run a one layer Generalized Denoising Autoencoder without a walkback procedure in the paper B 
+On GPU:
 
-run on gpu: THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_no_walkback.py
+    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_gsn.py
+    
+On CPU:
 
-run on cpu: THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_no_walkback.py 
+    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py
 
-(6) Getting the log-likelihood estimation and inpainting as described in the paper A. 
+### To run a one layer Generalized Denoising Autoencoder with a walkback procedure from paper \[2\]
 
-To test a model, by generating inpainting pictures, and 10000 samples used by the parzen density estimator, run this command in this directory, with the params_epoch_X.pkl and config file that was generated when training the model. If multiple params_epoch_X.pkl files are present, the one with the largest epoch number is used.
+On GPU:
 
-THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py --test_model 1
+    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_walkback.py
 
----------------------------
-Important tips for running the codes:
+On CPU:
+
+    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback.py
+
+### To run a one layer Generalized Denoising Autoencoder without a walkback procedure from the paper \[2\]
+
+On GPU
+
+    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_no_walkback.py
+
+On CPU
+
+    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_no_walkback.py
+
+### Getting the log-likelihood estimation and inpainting as described in paper \[1\]
+
+To test a model, by generating inpainting pictures, and 10000 samples
+used by the parzen density estimator, run this command in this
+directory, with the `params_epoch_X.pkl` and `config` file that was
+generated when training the model. If multiple `params_epoch_X.pkl`
+files are present, the one with the largest epoch number is used.
+
+    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py --test_model 1
+
+
+
+Important tips for running the codes
+=====================================
 
 * (3), (4) and (5) will generate images for both the denoising and pseudo-Gibbs sampling, and save parameters every 5 epochs. We have provided some examples of the reconstruction and generated samples(consecutive Gibbs samples) under the directory 'images/' for 3 types of models. By just looking at the pictures there, it is clearly true that 2-layer model beats the 1-layer model with walkback training, which then beats the 1-layer model without walkback training.
 
