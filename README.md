@@ -68,7 +68,7 @@ is being used on a machine with a compatible GPU (more about
 
 
 
-#### Important tips for running the codes
+#### Important notes on running the code
 
 * (1), (2) and (3) will generate images for both the denoising and
   pseudo-Gibbs sampling, and save parameters every 5 epochs. We have
