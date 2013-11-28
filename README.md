@@ -94,11 +94,11 @@ is being used on a machine with a compatible GPU (more about
   message from Theano. The training starts when the following is
   printed out:
 
-        1       Train :  0.607192       Valid :  0.367054       Test  :  0.364999       time :  20.40169 MeanVisB :  -0.22522 W :  ['0.024063', '0.022423']
-        2       Train :  0.302400       Valid :  0.277827       Test  :  0.277751       time :  20.33490 MeanVisB :  -0.32510 W :  ['0.023877', '0.022512']
-        3       Train :  0.292427       Valid :  0.267693       Test  :  0.268585       time :  20.45896 MeanVisB :  -0.38779 W :  ['0.023882', '0.022544']
-        4       Train :  0.268086       Valid :  0.267201       Test  :  0.268247       time :  20.37603 MeanVisB :  -0.43271 W :  ['0.023856', '0.022535']
-        5       Train :  0.266533       Valid :  0.264087       Test  :  0.265572       time :  20.26944 MeanVisB :  -0.47086 W :  ['0.023840', '0.022517']
+        1    Train :  0.607192    Valid :  0.367054    Test  :  0.364999    time :  20.40169 MeanVisB :  -0.22522 W :  ['0.024063', '0.022423']
+        2    Train :  0.302400    Valid :  0.277827    Test  :  0.277751    time :  20.33490 MeanVisB :  -0.32510 W :  ['0.023877', '0.022512']
+        3    Train :  0.292427    Valid :  0.267693    Test  :  0.268585    time :  20.45896 MeanVisB :  -0.38779 W :  ['0.023882', '0.022544']
+        4    Train :  0.268086    Valid :  0.267201    Test  :  0.268247    time :  20.37603 MeanVisB :  -0.43271 W :  ['0.023856', '0.022535']
+        5    Train :  0.266533    Valid :  0.264087    Test  :  0.265572    time :  20.26944 MeanVisB :  -0.47086 W :  ['0.023840', '0.022517']
 
   For each training epoch, the first 3 numbers are the cost on the
   training, validation, and test sets, followed by the training time
