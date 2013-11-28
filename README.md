@@ -25,11 +25,9 @@ http://deeplearning.net/software/theano/
 
 1. Download the MNIST dataset from http://deeplearning.net/data/mnist/mnist.pkl.gz
 
-2. Unzip the file to generate mnist.pkl using 'gunzip mnist.pkl.gz'
+2. Unzip the file to generate mnist.pkl using `gunzip mnist.pkl.gz`
 
-3. (Optional) To visualize MNIST, run
-
-        python image_tiler.py
+3. (Optional) To visualize MNIST, run `python image_tiler.py`
 
 
 
