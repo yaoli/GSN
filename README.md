@@ -36,24 +36,19 @@ http://deeplearning.net/software/theano/
 Reproducing the Results
 ===============
 
-### To run a two layer Generative Stochastic Network from paper \[1\]
+All below commands are given in two formats: the first will run on the
+GPU and the second on the CPU. Choose whichever is most appropriate
+for your setup.  Of course, the GPU versions will only work if Theano
+is being used on a machine with a compatible GPU.
 
-On GPU:
+1. To run a two layer Generative Stochastic Network from paper \[1\]
 
     THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_gsn.py
-    
-On CPU:
-
     THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py
 
-### To run a one layer Generalized Denoising Autoencoder with a walkback procedure from paper \[2\]
-
-On GPU:
+2. To run a one layer Generalized Denoising Autoencoder with a walkback procedure from paper \[2\]
 
     THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_walkback.py
-
-On CPU:
-
     THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback.py
 
 ### To run a one layer Generalized Denoising Autoencoder without a walkback procedure from the paper \[2\]
