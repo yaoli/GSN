@@ -43,13 +43,13 @@ is being used on a machine with a compatible GPU.
 
 1. To run a two layer Generative Stochastic Network from paper \[1\]
 
-    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_gsn.py
-    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py
+        THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_gsn.py
+        THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_gsn.py
 
 2. To run a one layer Generalized Denoising Autoencoder with a walkback procedure from paper \[2\]
 
-    THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_walkback.py
-    THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback.py
+        THEANO_FLAGS=mode=FAST_RUN,device=gpu,floatX=float32 python run_dae_walkback.py
+        THEANO_FLAGS=mode=FAST_RUN,device=cpu,floatX=float32 python run_dae_walkback.py
 
 ### To run a one layer Generalized Denoising Autoencoder without a walkback procedure from the paper \[2\]
 
