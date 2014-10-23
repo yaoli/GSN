@@ -87,8 +87,6 @@ def experiment(state, channel):
                 exec('state.'+CV) in globals(), locals()
             except:
                 exec('state.'+CV.split('=')[0]+"='"+CV.split('=')[1]+"'") in globals(), locals()
-     
-
 
     else:
         # Save the current configuration
@@ -97,7 +95,6 @@ def experiment(state, channel):
         f = open('config', 'w')
         f.write(str(state))
         f.close()
-
 
     print state
     # Load the data, train = train+valid, and shuffle train
@@ -127,7 +124,7 @@ def experiment(state, channel):
     MRG = RNG_MRG.MRG_RandomStreams(1)
     
     # Network and training specifications
-    K               =   state.K # N hidden layers
+    K               =   state.K # number of hidden layers
     N               =   state.N # number of walkbacks 
     layer_sizes     =   [N_input] + [state.hidden_size] * K # layer sizes, from h0 to hK (h0 is the visible layer)
     learning_rate   =   theano.shared(cast32(state.learning_rate))  # learning rate
@@ -277,7 +274,6 @@ def experiment(state, channel):
 
  
     ''' F PROP '''
-    #X = T.fmatrix()
     if state.act == 'sigmoid':
         print 'Using sigmoid activation'
         hidden_activation = T.nnet.sigmoid
@@ -292,7 +288,6 @@ def experiment(state, channel):
     X_corrupt   = salt_and_pepper(X, state.input_salt_and_pepper)
 
     ''' hidden layer init '''
-
     hiddens     = [X_corrupt]
     p_X_chain   = [] 
     print "Hidden units initialization"
@@ -306,7 +301,6 @@ def experiment(state, channel):
     for i in range(N):
         update_layers(hiddens, p_X_chain)
     
-
     # COST AND GRADIENTS    
 
     print 'Cost w.r.t p(X|...) at every step in the graph'
