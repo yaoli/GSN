@@ -70,6 +70,7 @@ class GSN(object):
         x_corrupt = utils.salt_and_pepper(self.x, self.rng_theano, self.input_noise_level)
         # states include [x_corrupt, h1, h2, h3, ...]
         states_all = [x_corrupt]
+        self.states_hiddens = []
         p_x_chain   = []
         # init h0 with 0
         for w,b,i,n in zip(self.Ws, self.bs[1:], range(len(self.n_hiddens)),self.n_hiddens):
@@ -78,7 +79,7 @@ class GSN(object):
             state_h = theano.shared(numpy.zeros((self.minibatch_size,n),
                                                 dtype=floatX),'S%d'%(i+1))
             states_all.append(state_h)
-        
+            self.states_hiddens.append(state_h)
         # The layer update scheme
         print "Building the graph :", self.n_hprop,"updates"
         for i in range(self.n_hprop):
@@ -256,11 +257,14 @@ class GSN(object):
         print 'generate samples'
         N = 100
         # init state
-        h_states = [numpy.zeros((1,n),dtype=floatX) for n in self.n_hiddens]
-        x = self.train_x[0][numpy.newaxis, :]
+        samples = []
+        x = self.train_x[:self.minibatch_size]
         states = [x] + h_states
         for i in range(N):
-            self.sampling_one_step_fn()
+            vals = self.sampling_one_step_fn()
+            samples.append(vals[0])
+            h = samples[1:]
+            
     def make_plots(self, costs):
         costs = numpy.asarray(costs)
         plt.plot(costs[:,0],costs[:,1])

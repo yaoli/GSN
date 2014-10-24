@@ -38,7 +38,7 @@ config = DD({
         'input_sampling': True,
         'train': DD({
             # valid once every 'valid_freq' epochs
-            'valid_freq': 10,
+            'valid_freq': 1,
             # compute valid and test LL over this many of orderings
             'n_epochs': 1000,
             'minibatch_size': 100,
