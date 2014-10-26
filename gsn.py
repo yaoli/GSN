@@ -4,7 +4,8 @@ import theano.tensor as T
 import theano.sandbox.rng_mrg as RNG_MRG
 from theano.printing import pprint, debugprint
 from tools import RAB_tools
-from tools.RAB_tools import apply_act, constantX
+from tools.RAB_tools import apply_act, constantX, plt
+from data_tools import image_tiler
 import PIL.Image
 from collections import OrderedDict
 from image_tiler import *
@@ -18,6 +19,7 @@ floatX = 'float32'
 class GSN(object):
     def __init__(self, state, channel):
         model_config = state.GSN
+        self.state = state
         self.n_in = model_config.n_in
         self.n_out = model_config.n_out
         self.n_hiddens = model_config.n_hiddens
@@ -31,6 +33,7 @@ class GSN(object):
         self.hidden_add_noise_sigma = model_config.hidden_add_noise_sigma
         self.add_noise_to_hiddens = model_config.add_noise_to_hiddens
         self.input_sampling = model_config.input_sampling
+        self.force_h_states = model_config.force_h_states
         
         train_config = state.GSN.train
         self.n_epochs = train_config.n_epochs
@@ -48,7 +51,8 @@ class GSN(object):
         RAB_tools.create_dir_if_not_exist(self.save_model_path)
 
         self.costs = []
-
+        self.tables = None
+        
     def build_theano_fn(self):
         self.x = T.fmatrix('x')
         self.x.tag.test_value = numpy.random.normal(
@@ -91,7 +95,8 @@ class GSN(object):
         # now have new hiddens and p_X_chain
         # build the cost
         cost_steps = T.stacklists(
-            [T.mean(T.nnet.binary_crossentropy(rx, self.x)) for rx in p_x_chain])
+            [T.mean(T.nnet.binary_crossentropy(rx, self.x),axis=1).mean(0)
+             for rx in p_x_chain])
         cost = T.mean(cost_steps)
         updates = OrderedDict()
         consider_constant = None
@@ -105,7 +110,7 @@ class GSN(object):
         # now compiling
         self.train_fn = theano.function(
             inputs=[self.x],
-            outputs=cost,
+            outputs=[cost]+states[1:],
             updates=updates,
             name='train_fn'
         )
@@ -207,7 +212,23 @@ class GSN(object):
         # This is for the reason that we need to decide the dimension of all
         # H states beforehand, making it a theano shared variable.
         assert self.train_x.shape[0] % self.minibatch_size == 0
-        
+
+    def _h_states_to_table(self, use_idx, new_h_states):
+        assert self.tables
+        for table, new_h in zip(self.tables, new_h_states):
+            table[use_idx] = new_h
+            
+    def _table_to_shared_h_states(self, use_idx):
+        # build several tables that save for each example
+        # the final h states as an approximation of p(h|x)
+        # Init the table with ZERO for each example
+        if not self.tables:
+            # one table one h state
+            self.tables = [numpy.zeros((self.train_x.shape[0],n),dtype=floatX)
+                           for n in self.n_hiddens]
+        for table, h in zip(self.tables, self.states_hiddens):
+            h.set_value(table[use_idx])
+            
     def simple_sgd(self):
         #set up marginal
         self.bs[0].set_value(self.marginal)
@@ -216,6 +237,7 @@ class GSN(object):
         epoch_end = self.n_epochs
         minibatch_idx_overall = RAB_tools.generate_minibatch_idx(
             self.train_x.shape[0], self.minibatch_size)
+        
         while (epoch < epoch_end):
             costs_epoch = []
             for k, use_idx in enumerate(minibatch_idx_overall):
@@ -223,9 +245,14 @@ class GSN(object):
                     sys.stdout.write('\rTraining minibatches %d/%d'%(
                              k, len(minibatch_idx_overall)))
                     sys.stdout.flush()
+                if self.force_h_states:
+                    self._table_to_shared_h_states(use_idx)
                 minibatch_data = self.train_x[use_idx,:]
-
-                cost = self.train_fn(minibatch_data)
+                rvals = self.train_fn(minibatch_data)
+                cost = rvals[0]
+                h_states = rvals[1:]
+                if self.force_h_states:
+                    self._h_states_to_table(use_idx, h_states)
                 
                 if numpy.isnan(cost):
                     print 'cost is NaN'
@@ -255,15 +282,33 @@ class GSN(object):
 
     def generate_samples(self, epoch):
         print 'generate samples'
-        N = 100
+        N = 400
         # init state
         samples = []
         x = self.train_x[:self.minibatch_size]
-        states = [x] + h_states
         for i in range(N):
-            vals = self.sampling_one_step_fn()
+            if self.verbose:
+                sys.stdout.write('\rSampling %d/%d'%(i, N))
+                sys.stdout.flush()
+            vals = self.sampling_one_step_fn(x)
+            x = vals[0]
             samples.append(vals[0])
-            h = samples[1:]
+            hs = vals[2:]
+            # set the new init h states
+            for h_old, h_new in zip(self.states_hiddens, hs):
+                assert h_old.get_value().shape == h_new.shape
+                h_old.set_value(h_new)
+                
+        # after sampling, reset all the h_states to 0
+        for h in self.states_hiddens:
+            h.set_value((h.get_value()*0.).astype(floatX))
+            
+        # samples (N,B,D)
+        samples = numpy.asarray(samples)[:,0,:]
+        image_tiler.visualize_mnist(
+            samples,
+            save_path=self.save_model_path+'samples_e%d.png'%epoch,
+            how_many=samples.shape[0])
             
     def make_plots(self, costs):
         costs = numpy.asarray(costs)
@@ -275,9 +320,7 @@ class GSN(object):
         params = [param.get_value() for param in self.params]
         RAB_tools.dump_pkl(params, self.save_model_path + 'model_params_e%d.pkl'%epoch)
 
-    def generate_samples(self):
-        pass
-
+    
     def load_model_params(self, params_path):
         print '======================================'
         print 'loading learned parameters from %s'%params_path
@@ -294,12 +337,12 @@ class GSN(object):
         self.simple_sgd()
 
     def load_and_evaluate(self, params_path):
+        import ipdb; ipdb.set_trace()
         print 'load params and evaluate the trained model...'
         self.build_theano_fn()
         self.prepare_dataset()
         self.load_model_params(params_path)
-        self.generate_samples(how_many=1000,
-                              save_path=os.path.dirname(params_path)+'/samples.png')
+        self.generate_samples(epoch=self.state.load_trained.epoch)
         
 def train_from_scratch(state, data_engine, channel):
     model = GSN(state, channel)
