@@ -305,9 +305,11 @@ def experiment(state, channel):
 
     print 'Cost w.r.t p(X|...) at every step in the graph'
     #COST        =   T.mean(T.nnet.binary_crossentropy(reconstruction, X))
-    COST        =   [T.mean(T.nnet.binary_crossentropy(rX, X)) for rX in p_X_chain]
+    #COST        =   [T.mean(T.nnet.binary_crossentropy(rX, X)) for rX in p_X_chain]
+    COST = [T.mean(T.sqr(rX-X)) for rX in p_X_chain]
     show_COST   =   COST[-1] 
     COST        =   numpy.sum(COST)
+    #COST = T.mean(COST)
     
     params          =   weights_list + bias_list
     
