@@ -39,11 +39,11 @@ def get_shared_bias(n, name, offset = 0):
     return val
 
 def load_mnist(path):
-    data = cPickle.load(open(os.path.join(path,'mnist.pkl'), 'r'))
+    data = cPickle.load(open(os.path.join(path,'mnist.pkl'), 'rb'))
     return data
 
 def load_mnist_binary(path):
-    data = cPickle.load(open(os.path.join(path,'mnist.pkl'), 'r'))
+    data = cPickle.load(open(os.path.join(path,'mnist.pkl'), 'rb'))
     data = [list(d) for d in data] 
     data[0][0] = (data[0][0] > 0.5).astype('float32')
     data[1][0] = (data[1][0] > 0.5).astype('float32')
