@@ -29,10 +29,12 @@ http://deeplearning.net/software/theano/
 
 3. (Optional) To visualize MNIST, run `python image_tiler.py`
 
-
+### the 10-D manifold dataset is already there since the size is small
 
 Reproducing the Results
 ---------------------
+
+To reproduce the experiments on 10-D manifold, go into manifold_10d/, and run `python kernel_density.py`.  
 
 The below commands are given in two formats: the first will run on the
 GPU and the second on the CPU. Choose whichever is most appropriate
