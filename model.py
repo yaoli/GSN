@@ -119,8 +119,8 @@ def experiment(state, channel):
     test_X  = theano.shared(test_X)
 
     # Theano variables and RNG
-    X       = T.fmatrix()
-    index   = T.lscalar()
+    X       = T.fmatrix()   # Input of the graph
+    index   = T.lscalar()   # index to minibatch
     MRG = RNG_MRG.MRG_RandomStreams(1)
     
     # Network and training specifications
@@ -131,11 +131,6 @@ def experiment(state, channel):
     annealing       =   cast32(state.annealing) # exponential annealing coefficient
     momentum        =   theano.shared(cast32(state.momentum)) # momentum term
 
-    # THEANO VARIABLES
-    X       = T.fmatrix()   # Input of the graph
-    index   = T.lscalar()   # index to minibatch
-    MRG = RNG_MRG.MRG_RandomStreams(1)
- 
 
     # PARAMETERS : weights list and bias list.
     # initialize a list of weights and biases based on layer_sizes
